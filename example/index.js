@@ -5,46 +5,59 @@ import summary from './components/summary';
 import pagination from './components/pagination';
 import description from './components/description';
 
-import {data} from './dataLoader';
+import DataLoader from './asyncDataLoader';
 
-const tableContainerEl = document.getElementById('table-container');
-const tbody = tableContainerEl.querySelector('tbody');
-const summaryEl = tableContainerEl.querySelector('[data-st-summary]');
-
-const t = table({data, tableState: {sort: {}, filter: {}, slice: {page: 1, size: 50}}});
-const tableComponent = tableComponentFactory({el: tableContainerEl, table: t});
-
-summary({table: t, el: summaryEl});
-
-const paginationContainer = tableContainerEl.querySelector('[data-st-pagination]');
-pagination({table: t, el: paginationContainer});
+let dataLoader = new DataLoader(
+    document.getElementById('data-loader-container'),
+    document.getElementById('loading-spinner'),
+    document.getElementById('table-container')
+);
+dataLoader.bind(activateTable);
 
 
-const descriptionContainer = document.getElementById('description-container');
-tbody.addEventListener('click', event => {
+function activateTable(data) {
 
-    let target = event.target;
+    const tableContainerEl = document.getElementById('table-container');
+    const tbody = tableContainerEl.querySelector('tbody');
+    const summaryEl = tableContainerEl.querySelector('[data-st-summary]');
 
-    let tr = target.closest('tr');
-    if (!tr) return;
-    if (!tbody.contains(tr)) return;
+    const t = table({data, tableState: {sort: {}, filter: {}, slice: {page: 1, size: 50}}});
+    const tableComponent = tableComponentFactory({el: tableContainerEl, table: t});
 
-    let dataIndex = tr.getAttribute('data-index');
+    summary({table: t, el: summaryEl});
 
-    if (dataIndex && data[dataIndex]) {
+    const paginationContainer = tableContainerEl.querySelector('[data-st-pagination]');
+    pagination({table: t, el: paginationContainer});
+
+
+    const descriptionContainer = document.getElementById('description-container');
+    tbody.addEventListener('click', event => {
+
+        let target = event.target;
+
+        let tr = target.closest('tr');
+        if (!tr) return;
+        if (!tbody.contains(tr)) return;
+
+        let dataIndex = tr.getAttribute('data-index');
+
+        if (dataIndex && data[dataIndex]) {
+            descriptionContainer.innerHTML = '';
+            descriptionContainer.appendChild(description(data[dataIndex]));
+        }
+    });
+
+
+    tableComponent.onDisplayChange(displayed => {
+
         descriptionContainer.innerHTML = '';
-        descriptionContainer.appendChild(description(data[dataIndex]));
-    }
-});
+
+        tbody.innerHTML = '';
+        for (let r of displayed) {
+            const newChild = row(r.value, r.index, t);
+            tbody.appendChild(newChild);
+        }
+    });
+}
 
 
-tableComponent.onDisplayChange(displayed => {
-
-    descriptionContainer.innerHTML = '';
-
-    tbody.innerHTML = '';
-    for (let r of displayed) {
-        const newChild = row(r.value, r.index, t);
-        tbody.appendChild(newChild);
-    }
-});

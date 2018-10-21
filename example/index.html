@@ -8,21 +8,36 @@
 </head>
 <body>
 <main id="main">
-    <section id="table-container">
+
+    <section id="data-loader-container">
+        Выберите набор данных:
+        <button data-src="http://www.filltext.com/?rows=32&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D">
+            Вариант #1
+        </button>
+        <button data-src="http://www.filltext.com/?rows=1000&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&delay=3&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D">
+            Вариант #2
+        </button>
+        <button data-src="http://foobar777777fail.dev">Loading with fail</button>
+    </section>
+
+    <section id="loading-spinner" style="display: none">
+        <img src="./spinner.svg" width="100">
+    </section>
+
+    <section id="table-container" style="display: none">
         <div data-st-loading-indicator="">
             Processing ...
         </div>
         <table>
             <thead>
             <tr>
-                <th colspan="3">
+                <th colspan="5">
                     <div data-st-search-form="id, firstName, lastName, email, phone">
                         <label for="search">global search</label>
                         <input id="search" placeholder="Case sensitive search" type="text"/>
                         <button id="searchButton">Search</button>
                     </div>
                 </th>
-                <th colspan="2"></th>
             </tr>
             <tr>
                 <th data-st-sort="id" data-st-sort-cycle>Id</th>
@@ -46,15 +61,14 @@
             </tr>
             </tfoot>
         </table>
-    </section>
 
-    <section id="description-container">
+        <div id="description-container">
+        </div>
+
     </section>
 
 </main>
 
-
-<!--<script src="dataBundle.js"></script>-->
 <script src="bundle.js"></script>
 </body>
 </html>
