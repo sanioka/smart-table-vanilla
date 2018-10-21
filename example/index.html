@@ -15,11 +15,14 @@
         <table>
             <thead>
             <tr>
-                <th colspan="5">
-                    <label for="search">global search</label>
-                    <input id="search" placeholder="Case sensitive search"
-                           data-st-search="id, firstName, lastName, email, phone" type="text"/>
+                <th colspan="3">
+                    <div data-st-search-form="id, firstName, lastName, email, phone">
+                        <label for="search">global search</label>
+                        <input id="search" placeholder="Case sensitive search" type="text"/>
+                        <button id="searchButton">Search</button>
+                    </div>
                 </th>
+                <th colspan="2"></th>
             </tr>
             <tr>
                 <th data-st-sort="id" data-st-sort-cycle>Id</th>
