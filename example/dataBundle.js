@@ -4957,7 +4957,7 @@ var chance_1$1 = createCommonjsModule(function (module, exports) {
 const chance$1 = new chance_1$1();
 const source = [];
 
-for (let i = 0; i < 25000; i++) {
+for (let i = 0; i < 3; i++) {
   const person = {
     id: i + 1,
     name: {

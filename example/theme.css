@@ -69,6 +69,14 @@ tbody > tr:nth-child(2n) {
     background: #e5f2fa;
 }
 
+tbody > tr:hover {
+    background: #aaa;
+}
+
+#table-container > table{
+    cursor: pointer;
+}
+
 [data-st-pagination]{
     text-align: right;
 }
@@ -90,4 +98,12 @@ input:focus {
 label {
     font-size: 0.8em;
     font-style: normal;
+}
+
+#description-container > div {
+    margin: 15px;
+    width: 50%;
+    border: 1px dotted;
+    padding: 15px;
+    line-height: 20px;
 }
