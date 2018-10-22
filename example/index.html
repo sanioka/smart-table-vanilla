@@ -9,6 +9,7 @@
 <body>
 <main id="main">
 
+    <!-- AsyncDataLoader -->
     <section id="data-loader-container">
         Выберите набор данных:
         <button data-src="http://www.filltext.com/?rows=32&id=%7Bnumber%7C1000%7D&firstName=%7BfirstName%7D&lastName=%7BlastName%7D&email=%7Bemail%7D&phone=%7Bphone%7C(xxx)xxx-xx-xx%7D&adress=%7BaddressObject%7D&description=%7Blorem%7C32%7D">
@@ -23,49 +24,12 @@
     <section id="loading-spinner" style="display: none">
         <img src="./spinner.svg" width="100">
     </section>
+    <!-- @end AsyncDataLoader -->
 
-    <section id="table-container" style="display: none">
-        <div data-st-loading-indicator="">
-            Processing ...
-        </div>
-        <table>
-            <thead>
-            <tr>
-                <th colspan="5">
-                    <div data-st-search-form="id, firstName, lastName, email, phone">
-                        <label for="search">global search</label>
-                        <input id="search" placeholder="Case sensitive search" type="text"/>
-                        <button id="searchButton">Search</button>
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                <th data-st-sort="id" data-st-sort-cycle>Id</th>
-                <th data-st-sort="firstName">firstName</th>
-                <th data-st-sort="lastName">lastName</th>
-                <th data-st-sort="email">email</th>
-                <th data-st-sort="phone">phone</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td colspan="5">Loading data ...</td>
-            </tr>
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="3" data-st-summary></td>
-                <td colspan="2">
-                    <div data-st-pagination></div>
-                </td>
-            </tr>
-            </tfoot>
-        </table>
 
-        <div id="description-container">
-        </div>
-
-    </section>
+    <!-- SmartTable -->
+    <section id="table-container" style="display: none"></section>
+    <!-- @end SmartTable -->
 
 </main>
 

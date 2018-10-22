@@ -1,23 +1,22 @@
 /**
  * Модуль асинхронной загрузки данных
- * В случае успешной загрузки передаёт управление подписчикам
- * Так же управляет DOM: спиннер загрузки и обработка ошибок
+ * В случае успешной загрузки отправляет данные в eventListeners
+ * Так же управляет DOM, спиннером загрузки и обрабатывает ошибки
  */
 
-export default DataLoader;
+export default AsyncDataLoader;
 
 const STATE_LOADING = 'STATE_LOADING';
 const STATE_EMPTY = 'STATE_EMPTY';
 const STATE_LOADED_SUCCESSFUL = 'STATE_LOADED_SUCCESSFUL';
 
-class DataLoader {
+class AsyncDataLoader {
 
     constructor(container, spinnerContainer, tableContainer) {
         if (container && spinnerContainer && tableContainer) {
             this.container = container;
             this.spinnerContainer = spinnerContainer;
             this.tableContainer = tableContainer;
-
             this.subscribeEvents();
 
             this.renderState = STATE_EMPTY;
@@ -33,25 +32,30 @@ class DataLoader {
         if (dataLoaderButtons) {
             for (let el of dataLoaderButtons) {
                 el.addEventListener('click', ev => {
-                    let url = el.getAttribute('data-src');
-                    if (url) {
-                        this.renderState = STATE_LOADING;
 
-                        fetch(url)
-                            .then(response => {
-                                this.renderState = STATE_LOADED_SUCCESSFUL;
-                                return response.json()
-                            })
-                            .then(response => {
-                                for (let handler of this.eventListeners) {
-                                    handler(response);
-                                }
-                            })
-                            .catch(err => {
-                                this.renderState = STATE_EMPTY;
-                                console.error(err)
-                            })
+                    // Защита от повторных нажатий в момент Pending
+                    if (this.renderState !== STATE_LOADING) {
+                        let url = el.getAttribute('data-src');
+                        if (url) {
+                            this.renderState = STATE_LOADING;
+
+                            fetch(url)
+                                .then(response => {
+                                    return response.json()
+                                })
+                                .then(response => {
+                                    for (let handler of this.eventListeners) {
+                                        handler(response);
+                                    }
+                                    this.renderState = STATE_LOADED_SUCCESSFUL;
+                                })
+                                .catch(err => {
+                                    this.renderState = STATE_EMPTY;
+                                    console.error(err)
+                                })
+                        }
                     }
+
                 })
             }
         }
@@ -81,6 +85,10 @@ class DataLoader {
                 this.tableContainer.style.display = 'block';
                 break;
         }
+    }
+
+    get renderState() {
+        return this._renderState;
     }
 
 }

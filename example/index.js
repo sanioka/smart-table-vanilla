@@ -1,63 +1,26 @@
-import {table as tableComponentFactory} from '../index';
-import {table} from 'smart-table-core';
-import row from './components/row';
-import summary from './components/summary';
-import pagination from './components/pagination';
-import description from './components/description';
+import AsyncDataLoader from './components/async-data-loader';
+import SmartTable from './components/smart-table/smart-table';
 
-import DataLoader from './asyncDataLoader';
+let tableContainer = document.getElementById('table-container');
 
-let dataLoader = new DataLoader(
+// #1 Инициализируем асинхронный загрузчик данных
+let dataLoader = new AsyncDataLoader(
     document.getElementById('data-loader-container'),
     document.getElementById('loading-spinner'),
-    document.getElementById('table-container')
+    tableContainer
 );
-dataLoader.bind(activateTable);
 
+// #2 Инициализируем модуль отображения данных
+let smartTable;
 
-function activateTable(data) {
+function onLoadedData(responseData) {
+    if (smartTable) {
+        smartTable.onDestroy();
+        smartTable = null;
+    }
 
-    const tableContainerEl = document.getElementById('table-container');
-    const tbody = tableContainerEl.querySelector('tbody');
-    const summaryEl = tableContainerEl.querySelector('[data-st-summary]');
-
-    const t = table({data, tableState: {sort: {}, filter: {}, slice: {page: 1, size: 50}}});
-    const tableComponent = tableComponentFactory({el: tableContainerEl, table: t});
-
-    summary({table: t, el: summaryEl});
-
-    const paginationContainer = tableContainerEl.querySelector('[data-st-pagination]');
-    pagination({table: t, el: paginationContainer});
-
-
-    const descriptionContainer = document.getElementById('description-container');
-    tbody.addEventListener('click', event => {
-
-        let target = event.target;
-
-        let tr = target.closest('tr');
-        if (!tr) return;
-        if (!tbody.contains(tr)) return;
-
-        let dataIndex = tr.getAttribute('data-index');
-
-        if (dataIndex && data[dataIndex]) {
-            descriptionContainer.innerHTML = '';
-            descriptionContainer.appendChild(description(data[dataIndex]));
-        }
-    });
-
-
-    tableComponent.onDisplayChange(displayed => {
-
-        descriptionContainer.innerHTML = '';
-
-        tbody.innerHTML = '';
-        for (let r of displayed) {
-            const newChild = row(r.value, r.index, t);
-            tbody.appendChild(newChild);
-        }
-    });
+    smartTable = new SmartTable(tableContainer, responseData);
 }
 
-
+// #3 Привязываем сущности
+dataLoader.bind(onLoadedData);
