@@ -1,7 +1,7 @@
 import {table as tableComponentFactory} from '../../../index';
 import {table} from 'smart-table-core';
 
-import initContent from './init-content';
+import {initContent as initContentSkeleton} from './init-content';
 import row from './row';
 import summary from './summary';
 import pagination from './pagination';
@@ -12,67 +12,70 @@ export default SmartTable;
 const MAX_ROWS_PER_PAGE = 50;
 
 class SmartTable {
-    constructor(tableContainerEl, data) {
-        if (tableContainerEl) {
-            this.tableContainerEl = tableContainerEl;
-            this.onInit();
-            this.activateTable(data);
-        }
+    constructor({tableContainer, data}) {
+        this.tableContainerEl = tableContainer;
+        initContentSkeleton(tableContainer);
+        onInit(tableContainer, data);
     }
 
-    onInit() {
-        initContent(this.tableContainerEl)
+    static createInstance({tableContainer, data}) {
+        if (tableContainer && data && Array.isArray(data)) {
+            return new SmartTable({tableContainer, data})
+        } else {
+            return null;
+        }
     }
 
     onDestroy() {
         this.tableContainerEl.innerHTML = '';
+        // TODO: document.removeEventListener
     }
 
-    activateTable(data) {
+}
 
-        let tableContainerEl = this.tableContainerEl;
+// private method
+function onInit(tableContainerEl, data) {
 
-        const tbody = tableContainerEl.querySelector('tbody');
+    const tbody = tableContainerEl.querySelector('tbody');
 
-        // Сборка smart-table-core
-        const t = table({data, tableState: {sort: {}, filter: {}, slice: {page: 1, size: MAX_ROWS_PER_PAGE}}});
-        const tableComponent = tableComponentFactory({el: tableContainerEl, table: t});
+    // Сборка smart-table-core
+    const t = table({data, tableState: {sort: {}, filter: {}, slice: {page: 1, size: MAX_ROWS_PER_PAGE}}});
+    const tableComponent = tableComponentFactory({el: tableContainerEl, table: t});
 
-        // Сборка модуля summary
-        const summaryEl = tableContainerEl.querySelector('[data-st-summary]');
-        summary({table: t, el: summaryEl});
+    // Сборка модуля summary
+    const summaryEl = tableContainerEl.querySelector('[data-st-summary]');
+    summary({table: t, el: summaryEl});
 
-        // Сборка модуля пагинации
-        const paginationContainer = tableContainerEl.querySelector('[data-st-pagination]');
-        pagination({table: t, el: paginationContainer});
+    // Сборка модуля пагинации
+    const paginationContainer = tableContainerEl.querySelector('[data-st-pagination]');
+    pagination({table: t, el: paginationContainer});
 
-        // Сборка модуля описания
-        const descriptionContainer = document.getElementById('description-container');
-        tbody.addEventListener('click', event => {
+    // Сборка модуля описания
+    const descriptionContainer = document.getElementById('description-container');
+    tbody.addEventListener('click', event => {
 
-            let target = event.target;
+        let target = event.target;
 
-            let tr = target.closest('tr');
-            if (!tr) return;
-            if (!tbody.contains(tr)) return;
+        let tr = target.closest('tr');
+        if (!tr) return;
+        if (!tbody.contains(tr)) return;
 
-            let dataIndex = tr.getAttribute('data-index');
+        let dataIndex = tr.getAttribute('data-index');
 
-            if (dataIndex && data[dataIndex]) {
-                descriptionContainer.innerHTML = '';
-                descriptionContainer.appendChild(description(data[dataIndex]));
-            }
-        });
-
-        // Сборка модуля рендера
-        tableComponent.onDisplayChange(displayed => {
+        if (dataIndex && data[dataIndex]) {
             descriptionContainer.innerHTML = '';
+            descriptionContainer.appendChild(description(data[dataIndex]));
+        }
+    });
 
-            tbody.innerHTML = '';
-            for (let r of displayed) {
-                const newChild = row(r.value, r.index, t);
-                tbody.appendChild(newChild);
-            }
-        });
-    }
+    // Сборка модуля рендера таблицы
+    tableComponent.onDisplayChange(displayed => {
+        descriptionContainer.innerHTML = '';
+
+        tbody.innerHTML = '';
+        for (let r of displayed) {
+            const newChild = row(r.value, r.index);
+            tbody.appendChild(newChild);
+        }
+    });
 }

@@ -12,17 +12,23 @@ const STATE_LOADED_SUCCESSFUL = 'STATE_LOADED_SUCCESSFUL';
 
 class AsyncDataLoader {
 
-    constructor(container, spinnerContainer, tableContainer) {
-        if (container && spinnerContainer && tableContainer) {
-            this.container = container;
-            this.spinnerContainer = spinnerContainer;
-            this.tableContainer = tableContainer;
-            this.subscribeEvents();
+    constructor({container, spinnerContainer, tableContainer}) {
+        this.container = container;
+        this.spinnerContainer = spinnerContainer;
+        this.tableContainer = tableContainer;
+        this.subscribeEvents();
 
-            this.renderState = STATE_EMPTY;
-        }
+        this.renderState = STATE_EMPTY;
 
         this.eventListeners = [];
+    }
+
+    static createInstance({container, spinnerContainer, tableContainer}) {
+        if (container && spinnerContainer && tableContainer) {
+            return new AsyncDataLoader({container, spinnerContainer, tableContainer});
+        } else {
+            return null;
+        }
     }
 
     subscribeEvents() {

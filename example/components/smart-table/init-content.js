@@ -1,4 +1,4 @@
-export default function (el) {
+export function initContent(el) {
     if (el) {
         el.innerHTML = `
         <div data-st-loading-indicator="">
