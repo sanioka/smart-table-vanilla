@@ -21,17 +21,20 @@ class AbstractComponent {
      * true — замещаем контейнер
      * false - вставляем внутрь
      */
-    appendTo(selector, isReplace = true) {
-        if (isReplace) {
-            let container = document.getElementById(selector);
-            if (container) {
-                container.parentNode.replaceChild(this.domElement, container);
-                this.domElement.className = selector;
-                this.domElement.setAttribute('id', selector);
-            }
-        } else {
+    appendTo(selector) {
+        this.appendChildSafety(document.querySelector(selector), this.domElement);
+    }
 
-            this.appendChildSafety(document.querySelector(selector), this.domElement);
+    /**
+     * Рендерит компонент и замещает контейрер
+     * @param selector
+     */
+    swapTo(selectorId) {
+        let container = document.getElementById(selectorId);
+        if (container) {
+            container.parentNode.replaceChild(this.domElement, container);
+            this.domElement.className = selectorId;
+            this.domElement.setAttribute('id', selectorId);
         }
     }
 

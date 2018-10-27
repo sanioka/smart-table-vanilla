@@ -1,33 +1,38 @@
+import AbstractComponent from '../abstract-component';
+
 import {table as tableComponentFactory} from '../../../index';
 import {table} from 'smart-table-core';
 
-import {initContent as initContentSkeleton} from './init-content';
-import row from './row';
-import summary from './summary';
-import pagination from './pagination';
-import description from './description';
+import {initContent as initContentSkeleton} from './template-helpers/init-content';
+import row from './template-helpers/row';
+import summary from './template-helpers/summary';
+import pagination from './template-helpers/pagination';
+import description from './template-helpers/description';
 
 export default SmartTable;
 
 const MAX_ROWS_PER_PAGE = 50;
 
-class SmartTable {
-    constructor({tableContainer, data}) {
-        this.tableContainerEl = tableContainer;
-        initContentSkeleton(tableContainer);
-        onInit(tableContainer, data);
+class SmartTable extends AbstractComponent {
+    constructor({data}) {
+        super();
+
+        this.domElement = this.getElementFactory('section');
+
+        initContentSkeleton(this.domElement);
+        onInit(this.domElement, data);
     }
 
-    static createInstance({tableContainer, data}) {
-        if (tableContainer && data && Array.isArray(data)) {
-            return new SmartTable({tableContainer, data})
+    static createInstance({data}) {
+        if (data && Array.isArray(data)) {
+            return new SmartTable({data})
         } else {
             return null;
         }
     }
 
     onDestroy() {
-        this.tableContainerEl.innerHTML = '';
+        this.domElement.innerHTML = '';
         // TODO: document.removeEventListener
     }
 
@@ -51,7 +56,7 @@ function onInit(tableContainerEl, data) {
     pagination({table: t, el: paginationContainer});
 
     // Сборка модуля описания
-    const descriptionContainer = document.getElementById('description-container');
+    const descriptionContainer = tableContainerEl.querySelector('#description-container');
     tbody.addEventListener('click', event => {
 
         let target = event.target;

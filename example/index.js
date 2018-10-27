@@ -19,7 +19,7 @@ let buttonsConfig = [
     },
 ];
 let asyncDataLoader = AsyncDataLoader.createInstance({buttonsConfig});
-asyncDataLoader.appendTo('data-loader-container');
+asyncDataLoader.swapTo('data-loader-container');
 
 // #2 Инициализируем модуль отображения данных
 let smartTable;
@@ -34,7 +34,8 @@ function destroySmartTable() {
 function createSmartTable(responseData) {
     if (responseData) {
         destroySmartTable();
-        smartTable = SmartTable.createInstance({tableContainer, data: responseData});
+        smartTable = SmartTable.createInstance({data: responseData});
+        smartTable.swapTo('table-container');
     }
 }
 
