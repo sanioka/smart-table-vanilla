@@ -1,3 +1,5 @@
+// TODO: переписать на appendChild, выпилить работу со строками и innerHTML
+
 export default function (item) {
 
     const div = document.createElement('div');

@@ -1,3 +1,5 @@
+// TODO: переписать на appendChild, выпилить работу со строками и innerHTML
+
 export default function ({id, firstName, lastName, email, phone}, index) {
     const tr = document.createElement('tr');
     tr.setAttribute('data-index', index);

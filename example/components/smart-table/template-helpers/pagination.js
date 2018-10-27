@@ -1,5 +1,7 @@
 import {slice} from 'smart-table-core';
 
+// TODO: переписать на appendChild, выпилить работу со строками и innerHTML
+
 export default function paginationComponent({table, el}) {
     const previousButton = document.createElement('button');
     previousButton.innerHTML = 'Previous';

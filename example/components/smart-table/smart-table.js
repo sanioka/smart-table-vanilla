@@ -12,6 +12,7 @@ import description from './template-helpers/description';
 export default SmartTable;
 
 const MAX_ROWS_PER_PAGE = 50;
+const _onInit = Symbol('onInit');
 
 class SmartTable extends AbstractComponent {
     constructor({data}) {
@@ -20,7 +21,7 @@ class SmartTable extends AbstractComponent {
         this.domElement = this.getElementFactory('section');
 
         initContentSkeleton(this.domElement);
-        onInit(this.domElement, data);
+        this[_onInit](this.domElement, data);
     }
 
     static createInstance({data}) {
@@ -36,51 +37,60 @@ class SmartTable extends AbstractComponent {
         // TODO: document.removeEventListener
     }
 
-}
+    /**
+     * Приватный метод onInit
+     * Инициализирует компонент smart-table и навешивает обработчики
+     * Основа содержимого этого метода взята из smart-table-vanilla примера
+     * TODO: доделать генерацию шаблона, привести в божеский вид
+     *
+     * @param tableContainerEl
+     * @param data
+     */
+    [_onInit](tableContainerEl, data) {
 
-// private method
-function onInit(tableContainerEl, data) {
+        let self = this;
 
-    const tbody = tableContainerEl.querySelector('tbody');
+        const tbody = tableContainerEl.querySelector('tbody');
 
-    // Сборка smart-table-core
-    const t = table({data, tableState: {sort: {}, filter: {}, slice: {page: 1, size: MAX_ROWS_PER_PAGE}}});
-    const tableComponent = tableComponentFactory({el: tableContainerEl, table: t});
+        // Сборка smart-table-core
+        const t = table({data, tableState: {sort: {}, filter: {}, slice: {page: 1, size: MAX_ROWS_PER_PAGE}}});
+        const tableComponent = tableComponentFactory({el: tableContainerEl, table: t});
 
-    // Сборка модуля summary
-    const summaryEl = tableContainerEl.querySelector('[data-st-summary]');
-    summary({table: t, el: summaryEl});
+        // Сборка модуля summary
+        const summaryEl = tableContainerEl.querySelector('[data-st-summary]');
+        summary({table: t, el: summaryEl});
 
-    // Сборка модуля пагинации
-    const paginationContainer = tableContainerEl.querySelector('[data-st-pagination]');
-    pagination({table: t, el: paginationContainer});
+        // Сборка модуля пагинации
+        const paginationContainer = tableContainerEl.querySelector('[data-st-pagination]');
+        pagination({table: t, el: paginationContainer});
 
-    // Сборка модуля описания
-    const descriptionContainer = tableContainerEl.querySelector('#description-container');
-    tbody.addEventListener('click', event => {
+        // Сборка модуля описания
+        const descriptionContainer = tableContainerEl.querySelector('#description-container');
+        tbody.addEventListener('click', event => {
 
-        let target = event.target;
+            let target = event.target;
 
-        let tr = target.closest('tr');
-        if (!tr) return;
-        if (!tbody.contains(tr)) return;
+            let tr = target.closest('tr');
+            if (!tr) return;
+            if (!tbody.contains(tr)) return;
 
-        let dataIndex = tr.getAttribute('data-index');
+            let dataIndex = tr.getAttribute('data-index');
 
-        if (dataIndex && data[dataIndex]) {
+            if (dataIndex && data[dataIndex]) {
+                descriptionContainer.innerHTML = '';
+                self.appendChildSafety(descriptionContainer, description(data[dataIndex]))
+            }
+        });
+
+        // Сборка модуля рендера таблицы
+        tableComponent.onDisplayChange(displayed => {
             descriptionContainer.innerHTML = '';
-            descriptionContainer.appendChild(description(data[dataIndex]));
-        }
-    });
 
-    // Сборка модуля рендера таблицы
-    tableComponent.onDisplayChange(displayed => {
-        descriptionContainer.innerHTML = '';
+            tbody.innerHTML = '';
+            for (let r of displayed) {
+                self.appendChildSafety(tbody, row(r.value, r.index));
+            }
+        });
+    }
 
-        tbody.innerHTML = '';
-        for (let r of displayed) {
-            const newChild = row(r.value, r.index);
-            tbody.appendChild(newChild);
-        }
-    });
 }

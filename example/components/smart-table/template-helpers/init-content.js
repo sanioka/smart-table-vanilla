@@ -1,3 +1,4 @@
+// TODO: переписать на appendChild, выпилить работу со строками и innerHTML
 export function initContent(el) {
     if (el) {
         el.innerHTML = `
